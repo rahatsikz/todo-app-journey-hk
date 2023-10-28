@@ -5,21 +5,24 @@ import { useState, useEffect } from "react";
 import { BiSolidDownArrowCircle } from "react-icons/bi";
 
 const Home = () => {
-  const [todocount, setTodocount] = useState([]);
+  // const [todocount, setTodocount] = useState<any>([]);
+  const [viewForm, setViewForm] = useState(false);
+  const [allData, setAllData] = useState<any>([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/todo")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setTodocount(data);
-      });
-  }, [todocount]);
+    const storedData = localStorage.getItem("todos");
+    setAllData(storedData);
+    if (storedData) {
+      // If data exists in local storage, parse it to the appropriate data type
+      const parsedData = JSON.parse(storedData);
+      setAllData(parsedData);
+    }
+  }, [allData]);
 
   return (
     <section className='py-12'>
       <div className='grid justify-center mb-8'>
-        {todocount.length && (
+        {allData.length > 0 && (
           <div className='form-control'>
             <div className='input-group'>
               <input
@@ -49,7 +52,7 @@ const Home = () => {
       </div>
 
       <div className='grid gap-4 justify-center'>
-        {todocount.map((todo: any, index: any) => (
+        {allData?.map((todo: any, index: any) => (
           <div
             key={index}
             className='border grid justify-start gap-3 max-w-lg px-12 py-4 rounded'
@@ -82,9 +85,6 @@ const Home = () => {
                 <h1>{todo.title}</h1>
                 <p>{todo.description}</p>
               </div>
-              {/* <p>{todo.priority}</p> */}
-              {/* <p>{todo.category}</p> */}
-              {/* <p>{todo.calendar}</p> */}
             </div>
             <div className='flex items-center gap-2'>
               <div className='bg-primary h-2 w-2 rounded-full ml-10'> </div>
@@ -99,13 +99,19 @@ const Home = () => {
       </div>
 
       <div className='min-h-[16vh] flex justify-center items-center'>
-        {!todocount.length ? (
-          <TodoForm />
-        ) : (
-          <GenericButton>
-            <span>Add Task</span>
-            <BiSolidDownArrowCircle />
-          </GenericButton>
+        {!allData.length && <TodoForm />}
+        {allData.length > 0 && !viewForm && (
+          <div onClick={() => setViewForm(true)}>
+            <GenericButton>
+              <span>Add Task</span>
+              <BiSolidDownArrowCircle />
+            </GenericButton>
+          </div>
+        )}
+        {viewForm && (
+          <div className='mt-6'>
+            <TodoForm />
+          </div>
         )}
       </div>
     </section>

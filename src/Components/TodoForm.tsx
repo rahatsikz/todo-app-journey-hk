@@ -14,31 +14,34 @@ const TodoForm = () => {
 
     // console.log({ title, description, priority, category, calendar });
 
-    fetch("http://localhost:5000/addtodo", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const realData = {
+      title,
+      description,
+      priority,
+      category,
+      calendar,
+    };
+
+    const myData = localStorage.getItem("todos");
+
+    // Get existing data from local storage
+    const existingData = JSON.parse(myData as string) || [];
+
+    // Combine the existing data with the new data
+    const combinedData = [...existingData, realData];
+
+    // Update state and local storage with the combined data
+    localStorage.setItem("todos", JSON.stringify(combinedData));
+
+    form.reset();
+
+    toast("Task Added Successfully", {
+      style: {
+        borderRadius: "10px",
+        background: "#333",
+        color: "#fff",
       },
-      body: JSON.stringify({
-        title,
-        description,
-        priority,
-        category,
-        calendar,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        form.reset();
-        toast("Task Added Successfully", {
-          style: {
-            borderRadius: "10px",
-            background: "#333",
-            color: "#fff",
-          },
-        });
-      });
+    });
   };
 
   return (
