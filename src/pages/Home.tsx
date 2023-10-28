@@ -51,7 +51,17 @@ const Home = () => {
         )}
       </div>
 
-      <div className='grid gap-4 justify-center'>
+      <div
+        className={`mx-auto grid gap-6 justify-center 
+        ${allData.length % 2 === 0 && "lg:grid-cols-2 w-6/12"} 
+        ${
+          allData.length % 2 !== 0 &&
+          allData.length > 1 &&
+          "lg:grid-cols-3 w-9/12"
+        } 
+        
+        `}
+      >
         {allData?.map((todo: any, index: any) => (
           <div
             key={index}
