@@ -8,3 +8,17 @@
   background-position: left top;
   font-family: "Chivo Mono", monospace;
 } */
+input::placeholder {
+  color: white;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+select  {
+  color: white;
+}
+
+input  {
+  color: white;
+  font-size: 14px;
+}
