@@ -13,60 +13,92 @@ const Home = () => {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
 
-  let [filteredData, setFilteredData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+
+  // useEffect(() => {
+  //   const storedData = localStorage.getItem("todos");
+  //   setAllData(storedData);
+  //   if (storedData) {
+  //     // If data exists in local storage, parse it to the appropriate data type
+  //     const parsedData = JSON.parse(storedData);
+
+  //     if (search.length) {
+  //       filteredData = allData.filter((indivData: any) =>
+  //         indivData.title.toLowerCase().includes(search.toLowerCase())
+  //       );
+
+  //       setFilteredData(filteredData);
+  //     }
+  //     if (category.length) {
+  //       if (category === "All Category") {
+  //         // filteredData = allData;
+  //         setFilteredData(allData);
+  //       } else {
+  //         filteredData = allData.filter(
+  //           (indivData: any) => indivData.category === category
+  //         );
+
+  //         setFilteredData(filteredData);
+  //       }
+  //     }
+
+  //     if (
+  //       search.length &&
+  //       (category === "Personal Category" || category === "Work Category")
+  //     ) {
+  //       filteredData = allData.filter((indivData: any) => {
+  //         const titleMatch = indivData.title
+  //           .toLowerCase()
+  //           .includes(search.toLowerCase());
+  //         const categoryMatch = indivData.category === category;
+
+  //         return titleMatch && categoryMatch;
+  //       });
+  //       setFilteredData(filteredData);
+  //     } else if (category === "All Category" && search.length) {
+  //       // Show all data when the category is "All"
+  //       filteredData = allData.filter((indivData: any) =>
+  //         indivData.title.toLowerCase().includes(search.toLowerCase())
+  //       );
+  //       setFilteredData(filteredData);
+  //     } else {
+  //       filteredData = allData;
+  //     }
+  //     setAllData(parsedData);
+  //   }
+  // }, [search, category, allData, filteredData]);
 
   useEffect(() => {
     const storedData = localStorage.getItem("todos");
-    setAllData(storedData);
     if (storedData) {
-      // If data exists in local storage, parse it to the appropriate data type
       const parsedData = JSON.parse(storedData);
+      setAllData(parsedData);
+
+      let filtered = parsedData;
+
+      // setFilteredData(filtered);
 
       if (search.length) {
-        filteredData = allData.filter((indivData: any) =>
+        filtered = filtered.filter((indivData: any) =>
           indivData.title.toLowerCase().includes(search.toLowerCase())
         );
-
-        setFilteredData(filteredData);
-      }
-      if (category.length) {
-        if (category === "All") {
-          // filteredData = allData;
-          setFilteredData(allData);
-        } else {
-          filteredData = allData.filter(
-            (indivData: any) => indivData.category === category
-          );
-
-          setFilteredData(filteredData);
-        }
       }
 
-      if (
-        search.length &&
-        (category === "Personal Category" || category === "Work Category")
-      ) {
-        filteredData = allData.filter((indivData: any) => {
-          const titleMatch = indivData.title
-            .toLowerCase()
-            .includes(search.toLowerCase());
-          const categoryMatch = indivData.category === category;
-
-          return titleMatch && categoryMatch;
-        });
-        setFilteredData(filteredData);
-      } else if (category === "All Category" && search.length) {
-        // Show all data when the category is "All"
-        filteredData = allData.filter((indivData: any) =>
-          indivData.title.toLowerCase().includes(search.toLowerCase())
+      if (category && category !== "All Category") {
+        filtered = filtered.filter(
+          (indivData: any) => indivData.category === category
         );
-        setFilteredData(filteredData);
-      } else {
-        filteredData = allData;
       }
-      setAllData(parsedData);
+
+      if (!search.length && (!category.length || category === "All Category")) {
+        filtered = allData;
+      }
+
+      setFilteredData(filtered);
+
+      console.log({ filtered });
     }
-  }, [search, category]);
+  }, [search, category, allData]);
 
   const handleSearch = (e: {
     preventDefault: () => void;
@@ -78,7 +110,7 @@ const Home = () => {
     console.log({ search });
     setSearch(search);
     // console.log(filteredData);
-    setViewForm(false);
+    // setViewForm(false);
   };
   const handleCategory = (e: {
     preventDefault: () => void;
@@ -90,13 +122,14 @@ const Home = () => {
     console.log({ selectedCategory });
     setCategory(selectedCategory);
     // console.log(filteredData);
-    setViewForm(false);
+    // setViewForm(false);
   };
 
   const handleTodoDone = (index: any) => {
     const updatedData = [...allData];
     updatedData[index].done = !updatedData[index].done; // Toggle the "done" status
     setAllData(updatedData);
+    console.log({ index });
 
     // Update the data in localStorage
     localStorage.setItem("todos", JSON.stringify(updatedData));
@@ -139,7 +172,7 @@ const Home = () => {
                 name='selectcategory'
                 onChange={handleCategory}
               >
-                <option defaultValue={"All"}>All Category</option>
+                <option defaultValue={"All Category"}>All Category</option>
                 <option value={"Personal Category"}>Personal Category</option>
                 <option value={"Work Category"}>Work Category</option>
               </select>
@@ -155,64 +188,64 @@ const Home = () => {
             ? "lg:grid-cols-2 w-6/12"
             : "lg:grid-cols-3 w-9/12"
         } 
+        
        
         `}
       >
-        {(!search.length || !category.length) &&
-          allData?.map((todo: any, index: any) => (
-            <div
-              key={index}
-              className={`border grid justify-start gap-3 max-w-lg px-12 py-4 rounded ${
-                filteredData.length > 1 && "hidden"
-              }`}
-            >
-              <div className='flex items-center gap-4'>
-                <div>
-                  {todo.priority === "High Priority" && (
-                    <input
-                      type='radio'
-                      checked={todo.done}
-                      onChange={() => handleTodoDone(index)}
-                      name='radio-4'
-                      className='radio radio-accent'
-                    />
-                  )}
-                  {todo.priority === "Low Priority" && (
-                    <input
-                      type='radio'
-                      checked={todo.done}
-                      onChange={() => handleTodoDone(index)}
-                      name='radio-2'
-                      className='radio radio-primary'
-                    />
-                  )}
-                  {todo.priority === "Normal Priority" && (
-                    <input
-                      type='radio'
-                      checked={todo.done}
-                      onChange={() => handleTodoDone(index)}
-                      name='radio-6'
-                      className='radio radio-warning'
-                    />
-                  )}
-                </div>
-                <div className='grid gap-1'>
-                  <h1>{todo.title}</h1>
-                  <p>{todo.description}</p>
-                </div>
+        {(search.length > 0 || category.length > 0
+          ? filteredData
+          : allData
+        )?.map((todo: any, index: any) => (
+          <div
+            key={index}
+            className={`border grid justify-start gap-3 max-w-lg px-12 py-4 rounded `}
+          >
+            <div className='flex items-center gap-4'>
+              <div>
+                <input
+                  type='radio'
+                  checked={todo.done === true}
+                  onChange={() =>
+                    handleTodoDone(
+                      search.length > 0 || category.length > 0
+                        ? allData.indexOf(todo)
+                        : index
+                    )
+                  } // Use the index for consistency
+                  name={`radio-${index}`}
+                  className={`radio ${
+                    todo.priority === "High Priority"
+                      ? "radio-accent"
+                      : todo.priority === "Low Priority"
+                      ? "radio-primary"
+                      : "radio-warning"
+                  }`}
+                />
               </div>
-              <div className='flex items-center gap-2'>
-                <div className='bg-primary h-2 w-2 rounded-full ml-10'> </div>
-                <p> {todo.category} </p>
-              </div>
-              <div className='flex items-center gap-2'>
-                <div className='bg-primary h-2 w-2 rounded-full ml-10'> </div>
-                <p> {todo.calendar.slice(0, -6)} </p>
+              <div
+                className='grid gap-1'
+                style={{ textDecoration: todo.done && "line-through" }}
+              >
+                <h1>{todo.title}</h1>
+                <p>{todo.description}</p>
               </div>
             </div>
-          ))}
+            <div className='flex items-center gap-2'>
+              <div className='bg-primary h-2 w-2 rounded-full ml-10'> </div>
+              <p style={{ textDecoration: todo.done && "line-through" }}>
+                {todo.category}
+              </p>
+            </div>
+            <div className='flex items-center gap-2'>
+              <div className='bg-primary h-2 w-2 rounded-full ml-10'> </div>
+              <p style={{ textDecoration: todo.done && "line-through" }}>
+                {todo.calendar.slice(0, -6)}
+              </p>
+            </div>
+          </div>
+        ))}
 
-        {(search.length > 0 || category.length > 0) &&
+        {/* {(search.length > 0 || category.length > 0) &&
           filteredData?.map((todo: any, index: any) => (
             <div
               key={index}
@@ -224,8 +257,9 @@ const Home = () => {
                     <input
                       type='radio'
                       checked={todo.done}
-                      onChange={() => handleTodoDone(index)}
-                      name='radio-4'
+                      onClick={() => handleTodoDone(index)}
+                      // name={index}
+                      name={`radio-${index}`}
                       className='radio radio-accent'
                     />
                   )}
@@ -233,8 +267,9 @@ const Home = () => {
                     <input
                       type='radio'
                       checked={todo.done}
-                      onChange={() => handleTodoDone(index)}
-                      name='radio-2'
+                      onClick={() => handleTodoDone(index)}
+                      // name={index}
+                      name={`radio-${index}`}
                       className='radio radio-primary'
                     />
                   )}
@@ -242,71 +277,34 @@ const Home = () => {
                     <input
                       type='radio'
                       checked={todo.done}
-                      onChange={() => handleTodoDone(index)}
-                      name='radio-6'
+                      onClick={() => handleTodoDone(index)}
+                      // name={index}
+                      name={`radio-${index}`}
                       className='radio radio-warning'
                     />
                   )}
                 </div>
-                <div className='grid gap-1'>
+                <div
+                  className='grid gap-1'
+                  style={{ textDecoration: todo.done && "line-through" }}
+                >
                   <h1>{todo.title}</h1>
                   <p>{todo.description}</p>
                 </div>
               </div>
               <div className='flex items-center gap-2'>
                 <div className='bg-primary h-2 w-2 rounded-full ml-10'> </div>
-                <p> {todo.category} </p>
+                <p style={{ textDecoration: todo.done && "line-through" }}>
+                  {" "}
+                  {todo.category}{" "}
+                </p>
               </div>
               <div className='flex items-center gap-2'>
                 <div className='bg-primary h-2 w-2 rounded-full ml-10'> </div>
-                <p> {todo.calendar.slice(0, -6)} </p>
-              </div>
-            </div>
-          ))}
-
-        {/* {search.length > 0 &&
-          category.length > 0 &&
-          filteredData?.map((todo: any, index: any) => (
-            <div
-              key={index}
-              className='border grid justify-start gap-3 max-w-lg px-12 py-4 rounded'
-            >
-              <div className='flex items-center gap-4'>
-                <div>
-                  {todo.priority === "High Priority" && (
-                    <input
-                      type='radio'
-                      name='radio-4'
-                      className='radio radio-accent'
-                    />
-                  )}
-                  {todo.priority === "Low Priority" && (
-                    <input
-                      type='radio'
-                      name='radio-2'
-                      className='radio radio-primary'
-                    />
-                  )}
-                  {todo.priority === "Normal Priority" && (
-                    <input
-                      type='radio'
-                      name='radio-6'
-                      className='radio radio-warning'
-                    />
-                  )}
-                </div>
-                <div className='grid gap-1'>
-                  <h1>{todo.title}</h1>
-                  <p>{todo.description}</p>
-                </div>
-              </div>
-              <div className='flex items-center gap-2'>
-                <div className='bg-primary h-2 w-2 rounded-full ml-10'> </div>
-                <p> {todo.category} </p>
-              </div>
-              <div className='flex items-center gap-2'>
-                <div className='bg-primary h-2 w-2 rounded-full ml-10'> </div>
-                <p> {todo.calendar.slice(0, -6)} </p>
+                <p style={{ textDecoration: todo.done && "line-through" }}>
+                  {" "}
+                  {todo.calendar.slice(0, -6)}{" "}
+                </p>
               </div>
             </div>
           ))} */}
