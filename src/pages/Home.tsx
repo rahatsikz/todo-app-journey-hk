@@ -1,6 +1,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import toast from "react-hot-toast";
 import GenericButton from "../Components/GenericButton";
 import TodoForm from "../Components/TodoForm";
 import { useState, useEffect } from "react";
@@ -15,7 +16,30 @@ const Home = () => {
 
   const [filteredData, setFilteredData] = useState([]);
 
-  // useEffect(() => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [, setCopied] = useState(false);
+
+  const handleCopyToClipboard = async (textToCopy: any) => {
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setCopied(true);
+
+      toast("Copied", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+    }
+  };
+
   //   const storedData = localStorage.getItem("todos");
   //   setAllData(storedData);
   //   if (storedData) {
@@ -133,6 +157,14 @@ const Home = () => {
 
     // Update the data in localStorage
     localStorage.setItem("todos", JSON.stringify(updatedData));
+    toast("Congrats for Completing", {
+      icon: "👏",
+      style: {
+        borderRadius: "10px",
+        background: "#333",
+        color: "#fff",
+      },
+    });
   };
 
   return (
@@ -223,10 +255,16 @@ const Home = () => {
                 />
               </div>
               <div
-                className='grid gap-1'
+                className='grid gap-1 justify-items-start'
                 style={{ textDecoration: todo.done && "line-through" }}
               >
-                <h1>{todo.title}</h1>
+                <h1
+                  onClick={() => handleCopyToClipboard(todo.title)}
+                  className='cursor-pointer tooltip'
+                  data-tip='Copy to clipboard'
+                >
+                  {todo.title}
+                </h1>
                 <p>{todo.description}</p>
               </div>
             </div>
@@ -244,70 +282,6 @@ const Home = () => {
             </div>
           </div>
         ))}
-
-        {/* {(search.length > 0 || category.length > 0) &&
-          filteredData?.map((todo: any, index: any) => (
-            <div
-              key={index}
-              className='border grid justify-start gap-3 max-w-lg px-12 py-4 rounded'
-            >
-              <div className='flex items-center gap-4'>
-                <div>
-                  {todo.priority === "High Priority" && (
-                    <input
-                      type='radio'
-                      checked={todo.done}
-                      onClick={() => handleTodoDone(index)}
-                      // name={index}
-                      name={`radio-${index}`}
-                      className='radio radio-accent'
-                    />
-                  )}
-                  {todo.priority === "Low Priority" && (
-                    <input
-                      type='radio'
-                      checked={todo.done}
-                      onClick={() => handleTodoDone(index)}
-                      // name={index}
-                      name={`radio-${index}`}
-                      className='radio radio-primary'
-                    />
-                  )}
-                  {todo.priority === "Normal Priority" && (
-                    <input
-                      type='radio'
-                      checked={todo.done}
-                      onClick={() => handleTodoDone(index)}
-                      // name={index}
-                      name={`radio-${index}`}
-                      className='radio radio-warning'
-                    />
-                  )}
-                </div>
-                <div
-                  className='grid gap-1'
-                  style={{ textDecoration: todo.done && "line-through" }}
-                >
-                  <h1>{todo.title}</h1>
-                  <p>{todo.description}</p>
-                </div>
-              </div>
-              <div className='flex items-center gap-2'>
-                <div className='bg-primary h-2 w-2 rounded-full ml-10'> </div>
-                <p style={{ textDecoration: todo.done && "line-through" }}>
-                  {" "}
-                  {todo.category}{" "}
-                </p>
-              </div>
-              <div className='flex items-center gap-2'>
-                <div className='bg-primary h-2 w-2 rounded-full ml-10'> </div>
-                <p style={{ textDecoration: todo.done && "line-through" }}>
-                  {" "}
-                  {todo.calendar.slice(0, -6)}{" "}
-                </p>
-              </div>
-            </div>
-          ))} */}
       </div>
 
       <div className='min-h-[16vh] flex justify-center items-center'>
