@@ -1,3 +1,5 @@
+/* eslint-disable prefer-const */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import GenericButton from "../Components/GenericButton";
 import TodoForm from "../Components/TodoForm";
@@ -8,6 +10,9 @@ const Home = () => {
   // const [todocount, setTodocount] = useState<any>([]);
   const [viewForm, setViewForm] = useState(false);
   const [allData, setAllData] = useState<any>([]);
+  const [search, setSearch] = useState("");
+
+  let [filteredData, setFilteredData] = useState(allData);
 
   useEffect(() => {
     const storedData = localStorage.getItem("todos");
@@ -15,9 +20,31 @@ const Home = () => {
     if (storedData) {
       // If data exists in local storage, parse it to the appropriate data type
       const parsedData = JSON.parse(storedData);
+
+      if (search.length) {
+        filteredData = allData.filter((indivData: any) =>
+          indivData.title.toLowerCase().includes(search.toLowerCase())
+        );
+
+        setFilteredData(filteredData);
+      }
+
       setAllData(parsedData);
     }
   }, [allData]);
+
+  const handleSearch = (e: {
+    preventDefault: () => void;
+    currentTarget: any;
+  }) => {
+    e.preventDefault();
+
+    const search = e.currentTarget.value;
+    console.log({ search });
+    setSearch(search);
+    console.log(filteredData);
+    setViewForm(false);
+  };
 
   return (
     <section className='py-12'>
@@ -28,7 +55,8 @@ const Home = () => {
               <input
                 type='text'
                 placeholder='Search'
-                className='input input-bordered'
+                onChange={handleSearch}
+                className='input input-bordered focus:outline-none'
               />
               <button className='btn bg-[#171717] btn-square'>
                 <svg
@@ -53,59 +81,103 @@ const Home = () => {
 
       <div
         className={`mx-auto grid gap-6 justify-center 
-        ${allData.length % 2 === 0 && "lg:grid-cols-2 w-6/12"} 
         ${
-          allData.length % 2 !== 0 &&
-          allData.length > 1 &&
-          "lg:grid-cols-3 w-9/12"
+          allData.length % 2 === 0 && allData.length < 3
+            ? "lg:grid-cols-2 w-6/12"
+            : "lg:grid-cols-3 w-9/12"
         } 
-        
+       
         `}
       >
-        {allData?.map((todo: any, index: any) => (
-          <div
-            key={index}
-            className='border grid justify-start gap-3 max-w-lg px-12 py-4 rounded'
-          >
-            <div className='flex items-center gap-4'>
-              <div>
-                {todo.priority === "High Priority" && (
-                  <input
-                    type='radio'
-                    name='radio-4'
-                    className='radio radio-accent'
-                  />
-                )}
-                {todo.priority === "Low Priority" && (
-                  <input
-                    type='radio'
-                    name='radio-2'
-                    className='radio radio-primary'
-                  />
-                )}
-                {todo.priority === "Normal Priority" && (
-                  <input
-                    type='radio'
-                    name='radio-6'
-                    className='radio radio-warning'
-                  />
-                )}
+        {!search.length
+          ? allData?.map((todo: any, index: any) => (
+              <div
+                key={index}
+                className='border grid justify-start gap-3 max-w-lg px-12 py-4 rounded'
+              >
+                <div className='flex items-center gap-4'>
+                  <div>
+                    {todo.priority === "High Priority" && (
+                      <input
+                        type='radio'
+                        name='radio-4'
+                        className='radio radio-accent'
+                      />
+                    )}
+                    {todo.priority === "Low Priority" && (
+                      <input
+                        type='radio'
+                        name='radio-2'
+                        className='radio radio-primary'
+                      />
+                    )}
+                    {todo.priority === "Normal Priority" && (
+                      <input
+                        type='radio'
+                        name='radio-6'
+                        className='radio radio-warning'
+                      />
+                    )}
+                  </div>
+                  <div className='grid gap-1'>
+                    <h1>{todo.title}</h1>
+                    <p>{todo.description}</p>
+                  </div>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <div className='bg-primary h-2 w-2 rounded-full ml-10'> </div>
+                  <p> {todo.category} </p>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <div className='bg-primary h-2 w-2 rounded-full ml-10'> </div>
+                  <p> {todo.calendar.slice(0, -6)} </p>
+                </div>
               </div>
-              <div className='grid gap-1'>
-                <h1>{todo.title}</h1>
-                <p>{todo.description}</p>
+            ))
+          : filteredData?.map((todo: any, index: any) => (
+              <div
+                key={index}
+                className='border grid justify-start gap-3 max-w-lg px-12 py-4 rounded'
+              >
+                <div className='flex items-center gap-4'>
+                  <div>
+                    {todo.priority === "High Priority" && (
+                      <input
+                        type='radio'
+                        name='radio-4'
+                        className='radio radio-accent'
+                      />
+                    )}
+                    {todo.priority === "Low Priority" && (
+                      <input
+                        type='radio'
+                        name='radio-2'
+                        className='radio radio-primary'
+                      />
+                    )}
+                    {todo.priority === "Normal Priority" && (
+                      <input
+                        type='radio'
+                        name='radio-6'
+                        className='radio radio-warning'
+                      />
+                    )}
+                  </div>
+                  <div className='grid gap-1'>
+                    <h1>{todo.title}</h1>
+                    <p>{todo.description}</p>
+                  </div>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <div className='bg-primary h-2 w-2 rounded-full ml-10'> </div>
+                  <p> {todo.category} </p>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <div className='bg-primary h-2 w-2 rounded-full ml-10'> </div>
+                  <p> {todo.calendar.slice(0, -6)} </p>
+                </div>
               </div>
-            </div>
-            <div className='flex items-center gap-2'>
-              <div className='bg-primary h-2 w-2 rounded-full ml-10'> </div>
-              <p> {todo.category} </p>
-            </div>
-            <div className='flex items-center gap-2'>
-              <div className='bg-primary h-2 w-2 rounded-full ml-10'> </div>
-              <p> {todo.calendar.slice(0, -6)} </p>
-            </div>
-          </div>
-        ))}
+            ))}
       </div>
 
       <div className='min-h-[16vh] flex justify-center items-center'>

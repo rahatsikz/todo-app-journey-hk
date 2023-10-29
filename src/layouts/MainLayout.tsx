@@ -4,11 +4,12 @@ import bgImage from "../assets/bg.png";
 const MainLayout = () => {
   return (
     <div
-      className='min-h-screen bg-repeat-round'
+      className='min-h-screen hero bg-repeat-round'
       style={{
         backgroundImage: `url(${bgImage})`,
       }}
     >
+      <div className='hero-overlay bg-opacity-60'></div>
       <Outlet></Outlet>
     </div>
   );

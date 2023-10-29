@@ -70,8 +70,10 @@ const TodoForm = () => {
           </select>
           {/* Category */}
           <select className='select w-full max-w-xs' name='category'>
-            <option defaultValue={"Personal"}>Personal Category</option>
-            <option value={"Work"}>Work Category</option>
+            <option defaultValue={"Personal Category"}>
+              Personal Category
+            </option>
+            <option value={"Work Category"}>Work Category</option>
           </select>
         </div>
         <div>
