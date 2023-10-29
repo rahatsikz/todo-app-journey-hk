@@ -62,15 +62,11 @@ const Home = () => {
         );
         setFilteredData(filteredData);
       } else {
-        // Handle other categories or scenarios
-        // You can add more conditions here if needed
-        // For categories other than "Personal" or "Work"
-        // or when search is empty
         filteredData = allData;
       }
       setAllData(parsedData);
     }
-  }, [allData]);
+  }, [search, category]);
 
   const handleSearch = (e: {
     preventDefault: () => void;
@@ -81,7 +77,7 @@ const Home = () => {
     const search = e.currentTarget.value;
     console.log({ search });
     setSearch(search);
-    console.log(filteredData);
+    // console.log(filteredData);
     setViewForm(false);
   };
   const handleCategory = (e: {
@@ -93,8 +89,17 @@ const Home = () => {
     const selectedCategory = e.currentTarget.value;
     console.log({ selectedCategory });
     setCategory(selectedCategory);
-    console.log(filteredData);
+    // console.log(filteredData);
     setViewForm(false);
+  };
+
+  const handleTodoDone = (index: any) => {
+    const updatedData = [...allData];
+    updatedData[index].done = !updatedData[index].done; // Toggle the "done" status
+    setAllData(updatedData);
+
+    // Update the data in localStorage
+    localStorage.setItem("todos", JSON.stringify(updatedData));
   };
 
   return (
@@ -166,6 +171,8 @@ const Home = () => {
                   {todo.priority === "High Priority" && (
                     <input
                       type='radio'
+                      checked={todo.done}
+                      onChange={() => handleTodoDone(index)}
                       name='radio-4'
                       className='radio radio-accent'
                     />
@@ -173,6 +180,8 @@ const Home = () => {
                   {todo.priority === "Low Priority" && (
                     <input
                       type='radio'
+                      checked={todo.done}
+                      onChange={() => handleTodoDone(index)}
                       name='radio-2'
                       className='radio radio-primary'
                     />
@@ -180,6 +189,8 @@ const Home = () => {
                   {todo.priority === "Normal Priority" && (
                     <input
                       type='radio'
+                      checked={todo.done}
+                      onChange={() => handleTodoDone(index)}
                       name='radio-6'
                       className='radio radio-warning'
                     />
@@ -212,6 +223,8 @@ const Home = () => {
                   {todo.priority === "High Priority" && (
                     <input
                       type='radio'
+                      checked={todo.done}
+                      onChange={() => handleTodoDone(index)}
                       name='radio-4'
                       className='radio radio-accent'
                     />
@@ -219,6 +232,8 @@ const Home = () => {
                   {todo.priority === "Low Priority" && (
                     <input
                       type='radio'
+                      checked={todo.done}
+                      onChange={() => handleTodoDone(index)}
                       name='radio-2'
                       className='radio radio-primary'
                     />
@@ -226,6 +241,8 @@ const Home = () => {
                   {todo.priority === "Normal Priority" && (
                     <input
                       type='radio'
+                      checked={todo.done}
+                      onChange={() => handleTodoDone(index)}
                       name='radio-6'
                       className='radio radio-warning'
                     />
